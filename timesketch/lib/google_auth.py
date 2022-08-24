@@ -125,12 +125,14 @@ def get_oauth2_authorize_url(hosted_domain=None):
     csrf_token = _generate_random_token()
     nonce = _generate_random_token()
     redirect_uri = url_for(
-        "user_views.google_openid_connect", _scheme="https", _external=True
+        "user_views.google_openid_connect", _scheme="http", _external=True
     )
     scopes = ("openid", "email", "profile")
 
     # Add the generated CSRF token to the client session for later validation.
     session[CSRF_KEY] = csrf_token
+
+    print(f"Session {session}")
 
     # Generate authorization URL
     params = dict(
@@ -142,11 +144,13 @@ def get_oauth2_authorize_url(hosted_domain=None):
         nonce=nonce,  # Enable replay attack protection attack.
         redirect_uri=redirect_uri,
     )
+    print(params)
     if hosted_domain:
         params["hd"] = hosted_domain
 
     urlencoded_params = urlparse.urlencode(params)
     google_authorization_url = "{}?{}".format(auth_uri, urlencoded_params)
+    print(google_authorization_url)
     return google_authorization_url
 
 
@@ -165,7 +169,7 @@ def get_encoded_jwt_over_https(code):
 
     discovery_document = get_oauth2_discovery_document()
     redirect_uri = url_for(
-        "user_views.google_openid_connect", _scheme="https", _external=True
+        "user_views.google_openid_connect", _scheme="http", _external=True
     )
     post_data = {
         "code": code,

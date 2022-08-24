@@ -84,6 +84,8 @@ def login():
         hosted_domain = current_app.config.get("GOOGLE_OIDC_HOSTED_DOMAIN")
         # Save the next URL parameter in the session for redirect after login.
         session['next'] = request.args.get("next", "/")
+        print("Going to redirect")
+        print(session['next'])
         return redirect(get_oauth2_authorize_url(hosted_domain))
 
     # Google Identity-Aware Proxy authentication (using JSON Web Tokens)
@@ -348,13 +350,13 @@ def google_openid_connect():
         Redirect response.
     """
     error = request.args.get("error", None)
-
+    print(f"Error: {error}")
     if error:
         current_app.logger.error("OAuth2 flow error: {}".format(error))
         return abort(
             HTTP_STATUS_CODE_BAD_REQUEST, "OAuth2 flow error: {0!s}".format(error)
         )
-
+    print(request.args)
     try:
         code = request.args["code"]
         client_csrf_token = request.args.get("state")
